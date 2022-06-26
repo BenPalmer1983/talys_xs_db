@@ -1,0 +1,5 @@
+projectile p
+element Mg
+mass 025
+energy 0.01 0.2 0.01
+ejectiles g n p d t h a outtype

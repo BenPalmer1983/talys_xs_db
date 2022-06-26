@@ -1,0 +1,5 @@
+projectile n
+element Ne
+mass 022
+energy 0.01 0.2 0.01
+ejectiles g n p d t h a outtype
