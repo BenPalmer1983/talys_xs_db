@@ -462,6 +462,101 @@ class talys:
     else:
       return None
      
+     
+     
+
+  ############################
+  # Status
+  ############################  
+  
+  @staticmethod
+  def status(): 
+    print("##############################################")
+    print("    TALYS Cross Section Python Dictionary     ")
+    print("##############################################")
+    print("")
+    print("               DB STATUS                      ")
+    print("")
+  
+    ta = time.time()
+    talys.load()   
+    tload = time.time() - ta
+    print("Database load time: {:5.3f}s".format(tload))
+    print("")
+
+    """
+    talys.d = {}
+    talys.d['info'] = pz.load(talys.path_talys + "/info.pz", 'lzma')
+    talys.d['metastable'] = pz.load(talys.path_talys + "/metastable.pz", 'lzma')
+    talys.d['levels'] = pz.load(talys.path_talys + "/levels.pz", 'lzma')
+    talys.d['residual_xs'] = pz.load(talys.path_talys + "/residual_xs.pz", 'lzma')
+    talys.d['particle_xs'] = pz.load(talys.path_talys + "/particle_xs.pz", 'lzma')
+    talys.d['elastic_xs'] = pz.load(talys.path_talys + "/elastic_xs.pz", 'lzma')
+    talys.d['nonelastic_xs'] = pz.load(talys.path_talys + "/nonelastic_xs.pz", 'lzma')
+    talys.loaded = True
+    """
+    
+    # Available files
+    files = ['elastic_xs', 'nonelastic_xs', 'particle_xs', 'residual_xs']
+    total_data_points = 0
+    
+    projectiles = []
+    for f in files:
+      for projectile in talys.d[f].keys():
+        if(projectile not in projectiles):
+          projectiles.append(projectile)
+          
+    print("Projectiles:    ", end="")
+    for projectile in projectiles:
+      print(projectile, end=" ")
+    print()  
+    print()  
+      
+    for f in files:
+      projectiles = []
+      for projectile in talys.d[f].keys():
+        projectiles.append(projectile)
+      
+      print("{:24s} {:20s}".format("File:", f))
+      
+      for p in projectiles:
+        print("{:24s} {:20s}".format("Projectile:", p))
+        
+        targets = 0
+        data_points = 0
+        residuals = []
+        particles = []
+        for Z in talys.d[f][p].keys():
+          for A in talys.d[f][p][Z].keys():
+            for M in talys.d[f][projectile][Z][A].keys():
+              target = isotopes.inp(Z, A, M)
+              targets = targets + 1
+              if(f == "residual_xs"):
+                for r in talys.d[f][projectile][Z][A][M].keys():
+                  if(r not in residuals):
+                    residuals.append(r)
+                    data_points = data_points + len(talys.d[f][projectile][Z][A][M][r])
+              elif(f == "particle_xs"):
+                for r in talys.d[f][projectile][Z][A][M].keys():
+                  if(r not in particles):
+                    particles.append(r)
+                    data_points = data_points + len(talys.d[f][projectile][Z][A][M][r])
+              else:
+                data_points = data_points + len(talys.d[f][projectile][Z][A][M])
+        total_data_points = total_data_points + data_points 
+        print("{:24s} {:<10d}".format("Target isotopes:", targets))
+        if(f == "residual_xs"):
+          print("{:24s} {:<10d}".format("Residual isotopes:", len(residuals)))
+        print("{:24s} {:<10d}".format("Data points:", data_points))
+      print()  
+      
+    print("Total data points: ", total_data_points)
+    print()
+    tstatus = time.time() - ta
+    print("End time: ", tstatus)  
+        
+
+
 
   ############################
   # Misc
@@ -543,6 +638,10 @@ class talys:
     st = time.time()
     talys.load()
     print("Load time: ", time.time() - st)
+    
+    talys.status()
+    
+    exit()
 
     """
     talys.plot_pxs('56fe', 'p', 26, 56, 0)
